@@ -13,6 +13,12 @@ try {
         email TEXT NOT NULL,
         password TEXT NOT NULL
     )");
+    
+    $pdo->exec("CREATE TABLE IF NOT EXISTS failed_logins (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    ip_address TEXT NOT NULL,
+    attempt_time INTEGER NOT NULL
+    )");
 } catch (PDOException $e) {
     error_log("Database error: " . $e->getMessage());
     die("A database error occurred. Please try again later.");
