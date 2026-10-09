@@ -1,6 +1,11 @@
 <?php
 session_start();
 
+if (empty($_SESSION['csrf_token'])) {
+    $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
+}
+$csrf_token = $_SESSION['csrf_token'];
+
 if ($_SERVER["REQUEST_METHOD"] === "POST") {
     require_once __DIR__ . '/../private/process.php';
     exit;
@@ -16,7 +21,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
     if (isset($_SESSION['errors'])) {
         echo "<ul style='color:red;'>";
         foreach ($_SESSION['errors'] as $error) {
-            echo "<li>" . htmlspecialchars($error) . "</li>";
+            echo "<li>" . htmlspecialchars($error, ENT_QUOTES, 'UTF-8') . "</li>";
         }
         echo "</ul>";
         unset($_SESSION['errors']);
@@ -24,6 +29,8 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
     ?>
 
     <form action="form.php" method="POST">
+        <input type="hidden" name="csrf_token" value="<?php echo htmlspecialchars($csrf_token, ENT_QUOTES, 'UTF-8'); ?>">
+
         <label>Name (max 50 chars):</label><br>
         <input type="text" name="name" required maxlength="50"><br><br>
 

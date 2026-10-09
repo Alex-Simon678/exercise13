@@ -3,6 +3,13 @@
 $errors = [];
 $sanitized_data = [];
 
+if (empty($_POST['csrf_token']) || empty($_SESSION['csrf_token']) || !hash_equals($_SESSION['csrf_token'], $_POST['csrf_token'])) {
+    $errors[] = "CSRF validation failed. Request rejected.";
+    $_SESSION['errors'] = $errors;
+    header("Location: form.php");
+    exit;
+}
+
 $name = $_POST['name'] ?? '';
 if (empty($name)) {
     $errors[] = "Name is required.";
@@ -59,10 +66,10 @@ if (!empty($errors)) {
     exit;
 } else {
     echo "<h2>Submission Successful</h2>";
-    echo "<p><strong>Name:</strong> " . $sanitized_data['name'] . "</p>";
-    echo "<p><strong>Email:</strong> " . $sanitized_data['email'] . "</p>";
-    echo "<p><strong>Age:</strong> " . $sanitized_data['age'] . "</p>";
-    echo "<p><strong>Website:</strong> " . $sanitized_data['website'] . "</p>";
-    echo "<p><strong>Message:</strong> " . $sanitized_data['message'] . "</p>";
-    echo "<a href='form.php'>Go Back</a>";
+    echo "<p><strong>Name:</strong> " . htmlspecialchars($sanitized_data['name'], ENT_QUOTES, 'UTF-8') . "</p>";
+    echo "<p><strong>Email:</strong> " . htmlspecialchars($sanitized_data['email'], ENT_QUOTES, 'UTF-8') . "</p>";
+    echo "<p><strong>Age:</strong> " . htmlspecialchars((string)$sanitized_data['age'], ENT_QUOTES, 'UTF-8') . "</p>";
+    echo "<p><strong>Website:</strong> " . htmlspecialchars($sanitized_data['website'], ENT_QUOTES, 'UTF-8') . "</p>";
+    echo "<p><strong>Message:</strong> " . htmlspecialchars($sanitized_data['message'], ENT_QUOTES, 'UTF-8') . "</p>";
+    echo "<br><a href='form.php'>Go Back</a>";
 }
