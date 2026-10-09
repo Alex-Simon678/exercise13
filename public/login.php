@@ -1,5 +1,5 @@
 <?php
-session_start();
+require_once __DIR__ . '/../private/session.php';
 require_once __DIR__ . '/../private/db.php';
 
 $error = '';
@@ -15,19 +15,22 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         if ($user && password_verify($password, $user['password'])) {
             session_regenerate_id(true);
-            
+    
             $_SESSION['user_id'] = $user['id'];
             $_SESSION['username'] = $user['username'];
+            $_SESSION['last_activity'] = time();
+            $_SESSION['user_ip'] = $_SERVER['REMOTE_ADDR'] ?? '';
+            $_SESSION['user_agent'] = $_SERVER['HTTP_USER_AGENT'] ?? '';
             
             header("Location: protected.php");
             exit;
+        }
         } else {
             $error = "Invalid username or password.";
         }
     } else {
         $error = "Please enter both username and password.";
     }
-}
 ?>
 
 <form method="POST">
