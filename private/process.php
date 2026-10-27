@@ -1,9 +1,14 @@
 <?php
 
+require_once __DIR__ . '/logger.php';
+
 $errors = [];
 $sanitized_data = [];
 
 if (empty($_POST['csrf_token']) || empty($_SESSION['csrf_token']) || !hash_equals($_SESSION['csrf_token'], $_POST['csrf_token'])) {
+    $csrfReason = empty($_POST['csrf_token']) ? 'missing token in request'
+        : (empty($_SESSION['csrf_token']) ? 'no token in session' : 'token mismatch');
+    SecurityLogger::log('ATTACK', 'CSRF token validation failed', "Reason: $csrfReason | Page: form.php");
     $errors[] = "CSRF validation failed. Request rejected.";
     $_SESSION['errors'] = $errors;
     header("Location: form.php");
